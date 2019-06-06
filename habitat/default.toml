@@ -7,3 +7,4 @@ mongodb_database = "demo"
 port = "8080"
 shutdown-port = "8005"
 redirect-port = "8443"
+deployment = false
