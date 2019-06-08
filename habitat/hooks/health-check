@@ -1,4 +1,3 @@
-hooks/health-check
 #!/bin/sh
  
 # define default return code as 0
