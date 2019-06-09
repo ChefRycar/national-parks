@@ -2,7 +2,7 @@
  
 # define default return code as 0
 rc=0
-curl -sSf http://localhost:8080/national-park
+curl -o /dev/null -sSf http://{{sys.ip}}:8080/national-parks
 case $? in
   0)
     rc=1 ;;
