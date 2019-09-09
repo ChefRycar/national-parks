@@ -2,7 +2,7 @@
  
 # define default return code as 0
 rc=0
-awk /'Hello World'/ {{pkgPathFor "nrycar/libhelloworld"}}/helloworld.txt
+grep "Hello World" {{pkgPathFor "nrycar/libhelloworld"}}/helloworld.txt
 
 case $? in
   0)
