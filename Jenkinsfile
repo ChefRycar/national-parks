@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     env.HAB_PKG = sh (
-                        script: "ls -t ${workspace}/results | grep hart | head -n 1",
+                        script: "ls -t ${workspace}/results | grep hart | head -n 1 | sed 's/-x86_64-linux.hart//' | cut -d '-' -f 2-20 | sed 's/\\(.*\\)-/\\1\\//' | sed 's/\\(.*\\)-/\\1\\//'",
                         returnStdout: true
                         ).trim()
                 }
