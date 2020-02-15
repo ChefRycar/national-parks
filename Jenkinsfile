@@ -29,5 +29,18 @@ pipeline {
                 }
             }
         }
+        stage('promote-to-canary') {
+            steps {
+                script {
+                    env.HAB_PKG = sh (
+                        script: "ls -t "{$workspace}"/results | grep hart | head -n 1",
+                        returnStdout: true
+                        ).trim()
+                }
+                withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
+                  habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
+                }
+            }
+        }
     }
 }
