@@ -29,7 +29,7 @@ pipeline {
                 }
             }
         }
-        stage('promote-to-canary') {
+        stage('promote-to-dev') {
             steps {
                 script {
                     env.HAB_PKG = sh (
@@ -39,6 +39,23 @@ pipeline {
                 }
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
                   habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
+                }
+            }
+        }
+        stage('test-dev') {
+            steps {
+                script {
+                    def latest_version=$(curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/stable/pkgs/national-parks/latest\?target\=x86_64-linux | jq -r '.ident | .release')
+                    def running_version=$(curl -s http://np-peer-dev.chef-demo.com:9631/census | jq -r '[.census_groups."national-parks.default".population[].pkg][0] | .release')
+                    while [ "$latest_version" != "$running_version" ]
+                    do
+                        echo "Waiting for deploy to complete..."
+                        sleep 5
+                        echo ". . . . . . . . ."
+                        latest_version=$(curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/stable/pkgs/national-parks/latest\?target\=x86_64-linux | jq -r '.ident | .release')
+                        running_version=$(curl -s http://np-peer-dev.chef-demo.com:9631/census | jq -r '[.census_groups."national-parks.default".population[].pkg][0] | .release')
+                    done
+                    echo "...deploy complete"
                 }
             }
         }
