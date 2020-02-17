@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     env.HAB_PKG = sh (
-                        script: "ls -t ${workspace}/results | grep hart | head -n 1 | sed 's/-x86_64-linux.hart//' | cut -d '-' -f 2-20 | sed 's/\\(.*\\)-/\\1\\//' | sed 's/\\(.*\\)-/\\1\\//'",
+                        script: "curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/unstable/pkgs/national-parks/latest\\?target\\=x86_64-linux | jq -r '.ident | .release",
                         returnStdout: true
                         ).trim()
                 }
