@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     env.HAB_PKG = sh (
-                        script: "curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/unstable/pkgs/national-parks/latest\\?target\\=x86_64-linux | jq -r '.ident | .release",
+                        script: "curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/unstable/pkgs/national-parks/latest\\?target\\=x86_64-linux | jq -r '.ident | .release'",
                         returnStdout: true
                         ).trim()
                 }
