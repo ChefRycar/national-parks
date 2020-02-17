@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        HAB_NOCOLORING = true
+        HAB_NOCOLORING = false
         HAB_BLDR_URL = 'https://bldr.habitat.sh/'
         HAB_ORIGIN = 'nrycar'
     }
