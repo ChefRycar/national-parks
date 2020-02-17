@@ -41,26 +41,13 @@ pipeline {
                   habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
                 script('check-deployment-status'){
-                   sh '/usr/local/deployment_status.sh' 
+                   sh '/usr/local/bin/deployment_status.sh' 
                 }
             }
         }
         stage('dev-health-check') {
             steps {
-                script {
-                    if [ `curl -s np-peer-dev.chef-demo.com:9631/services/national-parks/prod/health | jq .status` = "\"OK\"" ]; then
-                        echo "The app is healthy!"
-                        exit 0
-                    else
-                        echo "Something is horribly wrong!"
-                        exit 1
-                    fi    
-                }
-            }
-        }
-        stage('deployment-status') {
-            steps {
-                sh '/usr/local/deployment_status.sh'
+                sh '/usr/local/bin/health_check.sh'
             }
         }
     }
