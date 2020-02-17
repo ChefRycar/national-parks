@@ -48,12 +48,11 @@ pipeline {
         stage('dev-health-check') {
             steps {
                 script {
-                    np_health=`curl -s np-peer-dev.chef-demo.com:9631/services/national-parks/prod/health | jq .status`
-                    if [ "$np_health" = "\"OK\"" ]; then
+                    if [ `curl -s np-peer-dev.chef-demo.com:9631/services/national-parks/prod/health | jq .status` = "\"OK\"" ]; then
                         echo "The app is healthy!"
                         exit 0
                     else
-                        echo "Something is horribly wrong! The health check returned ${np_health}"
+                        echo "Something is horribly wrong!"
                         exit 1
                     fi    
                 }
