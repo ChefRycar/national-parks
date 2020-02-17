@@ -40,6 +40,23 @@ pipeline {
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
                   habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
+                script('check-deployment-status'){
+                   sh '/usr/local/deployment_status.sh' 
+                }
+            }
+        }
+        stage('dev-health-check') {
+            steps {
+                script {
+                    np_health=$(curl -s http://np-peer-dev.chef-demo.com:9631/services/national-parks/prod/health | jq .status)
+                    if [ "$np_health" = "\"OK\"" ]; then
+                        echo "The app is healthy!"
+                        exit 0
+                    else
+                        echo "Something is horribly wrong! The health check returned ${np_health}"
+                        exit 1
+                    fi    
+                }
             }
         }
         stage('deployment-status') {
