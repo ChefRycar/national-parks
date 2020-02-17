@@ -6,12 +6,12 @@ pipeline {
         HAB_ORIGIN = 'nrycar'
     }
     stages {
-        stage('scm') {
+        stage('Clone from GitHub') {
             steps {
                 git url: 'https://github.com/ChefRycar/national-parks.git', branch: 'master'
             }
         }
-        stage('build') {
+        stage('Build Chef Habitat Artifact') {
             steps {
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
                     script {
@@ -22,14 +22,25 @@ pipeline {
                 habitat task: 'build', directory: '.', origin: "${env.HAB_ORIGIN}", docker: true
             }
         }
-        stage('upload') {
+        stage('Upload to unstable channel on bldr.habitat.sh') {
             steps {
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
                     habitat task: 'upload', authToken: env.HAB_AUTH_TOKEN, lastBuildFile: "${workspace}/results/last_build.env", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
             }
         }
-        stage('promote-to-dev') {
+
+        stage('Wait for Deploy to Dev') {
+            steps {
+                sh '/usr/local/bin/deployment_status.sh' 
+            }
+        }
+        stage('Check Dev Health') {
+            steps {
+                sh '/usr/local/bin/health_check.sh'
+            }
+        }
+        stage('Promote to blue Channel') {
             steps {
                 script {
                     env.HAB_PKG = sh (
@@ -38,16 +49,8 @@ pipeline {
                         ).trim()
                 }
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
-                  habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
+                  habitat task: 'promote', channel: "blue", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
-                script('check-deployment-status'){
-                   sh '/usr/local/bin/deployment_status.sh' 
-                }
-            }
-        }
-        stage('dev-health-check') {
-            steps {
-                sh '/usr/local/bin/health_check.sh'
             }
         }
     }
