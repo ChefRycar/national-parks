@@ -29,17 +29,22 @@ pipeline {
                 }
             }
         }
-        stage('promote-to-canary') {
+        stage('promote-to-dev') {
             steps {
                 script {
                     env.HAB_PKG = sh (
-                        script: "ls -t ${workspace}/results | grep hart | head -n 1",
+                        script: "ls -t ${workspace}/results | grep hart | head -n 1 | sed 's/-x86_64-linux.hart//' | cut -d '-' -f 2-20 | sed 's/\\(.*\\)-/\\1\\//' | sed 's/\\(.*\\)-/\\1\\//'",
                         returnStdout: true
                         ).trim()
                 }
                 withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
-                  habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
+                  habitat task: 'promote', channel: "canary", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
+            }
+        }
+        stage('deployment-status') {
+            steps {
+                sh '/usr/local/deployment_status.sh'
             }
         }
     }
