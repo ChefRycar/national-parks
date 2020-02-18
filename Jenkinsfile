@@ -32,12 +32,12 @@ pipeline {
 
         stage('Wait for Deploy to Dev') {
             steps {
-                sh '/usr/local/bin/deployment_status.sh' 
+                sh '/usr/local/bin/deployment_status.sh national-parks np dev unstable' 
             }
         }
         stage('Check Dev Health') {
             steps {
-                sh '/usr/local/bin/health_check.sh'
+                sh '/usr/local/bin/health_check.sh national-parks np dev'
             }
         }
         stage('Promote to blue Channel') {
