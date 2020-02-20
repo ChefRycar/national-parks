@@ -37,7 +37,7 @@ pipeline {
         }
         stage('Check Dev Health') {
             steps {
-                sh '/usr/local/bin/health_check.sh national-parks np dev'
+                sh '/usr/local/bin/health_check.sh national-parks np dev unstable'
             }
         }
         stage('Promote to blue Channel') {
