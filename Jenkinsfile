@@ -41,6 +41,10 @@ pipeline {
             }
         }
         stage('Promote to blue Channel') {
+            input {
+                message "Ready to promote to prod?"
+                ok "Sure am!"
+            }
             steps {
                 script {
                     env.HAB_PKG = sh (
