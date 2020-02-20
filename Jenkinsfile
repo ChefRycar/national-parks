@@ -60,6 +60,7 @@ pipeline {
         stage('Wait for Deploy to Blue') {
             steps {
                 sh '/usr/local/bin/deployment_status.sh national-parks np prod prod-blue' 
+                sh 'sleep 5'
             }
         }
         stage('Check Prod-Blue Health') {
