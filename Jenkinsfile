@@ -85,7 +85,8 @@ pipeline {
                     sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-blue $(date +%s) deployment_stop.toml'
                     sh 'sleep 5'
                     sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-green $(date +%s) deployment_start.toml'
-                } 
+                }
+            }
         }
         stage('Promote to green Channel') {
             steps {
