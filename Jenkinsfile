@@ -40,11 +40,18 @@ pipeline {
                 sh '/usr/local/bin/health_check.sh national-parks np dev unstable'
             }
         }
-        stage('Promote to blue Channel') {
+        stage('Remove prod-blue from LB') {
             input {
                 message "Ready to promote to prod?"
                 ok "Sure am!"
             }
+            steps {
+                withCredentials([string(credentialsId: 'hab-ctl-secret', variable: 'HAB_CTL_SECRET')]) {
+                    sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-blue $(date +%s) deployment_start.toml'
+                } 
+            }
+        }
+        stage('Promote to blue Channel') {
             steps {
                 script {
                     env.HAB_PKG = sh (
