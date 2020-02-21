@@ -75,11 +75,19 @@ pipeline {
                 sh '/usr/local/bin/health_check.sh national-parks np prod prod-blue'
             }
         }
-        stage('Promote to green Channel') {
+        stage('Add blue & remove green from the LB') {
             input {
                 message "Is prod-blue looking healthy?"
                 ok "Sure is!"
             }
+            steps {
+                withCredentials([string(credentialsId: 'hab-ctl-secret', variable: 'HAB_CTL_SECRET')]) {
+                    sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-blue $(date +%s) deployment_stop.toml'
+                    sh 'sleep 5'
+                    sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-green $(date +%s) deployment_start.toml'
+                } 
+        }
+        stage('Promote to green Channel') {
             steps {
                 script {
                     env.HAB_PKG = sh (
@@ -91,6 +99,41 @@ pipeline {
                   habitat task: 'promote', channel: "prod-green", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
                 }
             }
-        }        
+        }
+        stage('Wait for Deploy to Green') {
+            steps {
+                sh '/usr/local/bin/deployment_status.sh national-parks np prod prod-green' 
+                sh 'sleep 5'
+            }
+        }
+        stage('Check Prod-Green Health') {
+            steps {
+                sh '/usr/local/bin/health_check.sh national-parks np prod prod-green'
+            }
+        }
+        stage('Add green back to LB') {
+            input {
+                message "Finish deployment?"
+                ok "You bet!"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'hab-ctl-secret', variable: 'HAB_CTL_SECRET')]) {
+                    sh 'hab config apply --remote-sup np-peer-prod.chef-demo.com:9632 national-parks.prod-green $(date +%s) deployment_stop.toml'
+                } 
+            }
+        }
+        stage('Promte to Stable') {
+            steps {
+                script {
+                    env.HAB_PKG = sh (
+                        script: "curl -s https://bldr.habitat.sh/v1/depot/channels/nrycar/prod-green/pkgs/national-parks/latest\\?target\\=x86_64-linux | jq '(.ident.name + \"/\" + .ident.version + \"/\" + .ident.release)'",
+                        returnStdout: true
+                        ).trim()
+                }
+                withCredentials([string(credentialsId: 'hab-depot-token', variable: 'HAB_AUTH_TOKEN')]) {
+                  habitat task: 'promote', channel: "stable", authToken: "${env.HAB_AUTH_TOKEN}", artifact: "${env.HAB_ORIGIN}/${env.HAB_PKG}", bldrUrl: "${env.HAB_BLDR_URL}"
+                }
+            }
+        }
     }
 }
