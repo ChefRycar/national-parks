@@ -4,11 +4,14 @@ services:
     image: scottford/mongodb
     environment:
       HAB_MONGODB: "[mongod.net]\nbind_ip = '0.0.0.0'\n[mongod.security]\ncluster_auth_mode = ''" 
+      HAB_LICENSE: "accept-no-persist"
   national-parks:
     image: nrycar/national-parks:latest
     command: --peer mongodb --bind database:mongodb.default
+    environment:
+      HAB_LICENSE: "accept-no-persist"
   haproxy:
-    image: core/haproxy:latest
+    image: nrycar/haproxy:latest
     command: --peer national-parks --bind backend:national-parks.default
     ports:
       - 8085:8085
@@ -16,3 +19,4 @@ services:
       - 8000:8000
     environment:
       HAB_HAPROXY: "maxconn = '32'\nhttpchk = 'GET /national-parks'\n[front-end]\nlisten = '*'\nport = '8085'\nmode = 'http'\n[status]\nenabled = true\nlisten = '*'\nport = '8000'\nuser = 'admin'\npassword = 'password'\nuri = '/haproxy-stats'"
+      HAB_LICENSE: "accept-no-persist"
