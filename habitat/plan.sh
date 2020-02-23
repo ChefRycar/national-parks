@@ -1,10 +1,10 @@
 pkg_name=national-parks
 pkg_description="A sample JavaEE Web app deployed in the Tomcat8 package"
 pkg_origin=nrycar
-pkg_version=8.0.1
+pkg_version=8.0.2
 pkg_maintainer="Nick Rycar <nrycar@chef.io>"
 pkg_license=('Apache-2.0')
-pkg_deps=(core/tomcat8 core/corretto core/mongo-tools core/curl nrycar/libhelloworld/4.0.0/20200220223451)
+pkg_deps=(core/tomcat8 core/corretto core/mongo-tools core/curl nrycar/libhelloworld)
 pkg_build_deps=(core/corretto core/maven)
 pkg_svc_user="root"
 pkg_binds=(
