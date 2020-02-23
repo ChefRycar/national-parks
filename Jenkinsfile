@@ -29,7 +29,7 @@ pipeline {
                 }
             }
         }
-        stage('Promote to blue Channel') {
+        stage('Promote to dev Channel') {
             steps {
                 script {
                     env.HAB_PKG = sh (
