@@ -3367,6 +3367,19 @@
     "Location":{"coordinates": [-105.933751,35.689361],"type":"Point"}
   },
   {
+    "Location Number": "olym",
+    "Location Name": "Olympic National Park",
+    "Address": "3002 Mt Angeles Rd, Port Angeles, WA 98362",
+    "City": "Port Angelis",
+    "State": "Washington",
+    "Zip Code": "98362",
+    "Phone Number": "(360) 565-3130",
+    "Fax Number": "(360) 565-3130",
+    "Latitude": 47.8021,
+    "Longitude": -123.6044,
+    "Location":{"coordinates": [-123.6044,47.8021],"type":"Point"}
+  },
+  {
     "Location Number": "OREG",
     "Location Name": "Oregon National Historic Trail",
     "Address": "National Park Service, 324 S. State St., Suite 200",
